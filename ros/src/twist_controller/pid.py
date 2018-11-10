@@ -1,10 +1,7 @@
-
-MIN_NUM = float('-inf')
-MAX_NUM = float('inf')
-
+import constants as const
 
 class PID(object):
-    def __init__(self, kp, ki, kd, mn=MIN_NUM, mx=MAX_NUM):
+    def __init__(self, kp, ki, kd, mn=const.MIN_NUM, mx=const.MAX_NUM):
         self.kp = kp
         self.ki = ki
         self.kd = kd
@@ -33,4 +30,5 @@ class PID(object):
             val = self.max
         elif val < self.min:
             val = self.min
+
         return val

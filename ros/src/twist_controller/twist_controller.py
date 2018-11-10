@@ -55,7 +55,6 @@ class Controller(object):
         steer = self.yaw_controller.get_steering(linear_vel, angular_vel, current_vel)
 
         vel_error = linear_vel - current_vel
-        self.last_vel = current_vel
 
         now = rospy.get_time()
         dt = now - self.last_time
@@ -67,7 +66,7 @@ class Controller(object):
             throttle = 0
             self.throttle_controller.reset()
             brake = const.BRAKE_STATIONARY_FORCE 
-        elif throttle < .1 and vel_error < 0:
+        elif throttle < const.CLOSE_TO_ZERO_SPEED and vel_error < 0:
             throttle = 0
             brake = abs( max(vel_error, self.decel_limit) * self.vehicle_mass * self.wheel_radius)
 
