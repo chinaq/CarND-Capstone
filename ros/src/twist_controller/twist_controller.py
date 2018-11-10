@@ -5,15 +5,15 @@ from lowpass import LowPassFilter
 
 GAS_DENSITY = 2.858
 ONE_MPH = 0.44704
-MIN_SPEED = 0.15
+CLOSE_TO_ZERO_SPEED = 0.15 # Consider this 0 speed
 THROTTLE_MIN = 0
 THROTTLE_MAX = 1
 
-CONTROLLER_P = 0.07
-CONTROLLER_I = 0.0
-CONTROLLER_D = 0.0
+THROTTLE_KP = 1000
+THROTTLE_KI = 0.001
+THROTTLE_KD = 50.0
 
-BRAKE_STATIONARY_FORCE = 700
+BRAKE_STATIONARY_FORCE = 700 # Nm to keep car stationary
 
 class Controller(object):
     def __init__(self,
@@ -30,7 +30,7 @@ class Controller(object):
         self.decel_limit = decel_limit
         self.vehicle_mass = vehicle_mass
         self.wheel_radius = wheel_radius
-        min_speed = MIN_SPEED
+        min_speed = CLOSE_TO_ZERO_SPEED
 
         self.yaw_controller = YawController(wheel_base,
                                             steer_ratio,
@@ -38,9 +38,9 @@ class Controller(object):
                                             max_lat_accel,
                                             max_steer_angle)
 
-        self.throttle_kp = CONTROLLER_P
-        self.throttle_ki = CONTROLLER_I
-        self.throttle_kd = CONTROLLER_D
+        self.throttle_kp = THROTTLE_KP
+        self.throttle_ki = THROTTLE_KI
+        self.throttle_kd = THROTTLE_KD
         self.throttle_controller = PID(self.throttle_kp,
                                        self.throttle_ki,
                                        self.throttle_kd,
@@ -74,9 +74,9 @@ class Controller(object):
 
         throttle = self.throttle_controller.step(vel_error,dt)
 
-        if linear_vel == 0 and current_vel < MIN_SPEED:
+        if linear_vel == 0 and current_vel < CLOSE_TO_ZERO_SPEED:
             throttle = 0
-            brake = BRAKE_STATIONARY_FORCE # Nm to keep car stationary
+            brake = BRAKE_STATIONARY_FORCE 
         elif throttle < .1 and vel_error < 0:
             throttle = 0
             brake = abs( max(vel_error, self.decel_limit) * self.vehicle_mass * self.wheel_radius)
