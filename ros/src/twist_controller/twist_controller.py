@@ -65,6 +65,7 @@ class Controller(object):
 
         if linear_vel == 0 and current_vel < const.CLOSE_TO_ZERO_SPEED:
             throttle = 0
+            self.throttle_controller.reset()
             brake = const.BRAKE_STATIONARY_FORCE 
         elif throttle < .1 and vel_error < 0:
             throttle = 0
