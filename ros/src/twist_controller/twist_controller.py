@@ -9,6 +9,11 @@ MIN_SPEED = 0.15
 THROTTLE_MIN = 0
 THROTTLE_MAX = 1
 
+CONTROLLER_P = 0.07
+CONTROLLER_I = 0.0
+CONTROLLER_D = 0.0
+
+BRAKE_STATIONARY_FORCE = 700
 
 class Controller(object):
     def __init__(self,
@@ -33,9 +38,9 @@ class Controller(object):
                                             max_lat_accel,
                                             max_steer_angle)
 
-        self.throttle_kp = 0.3
-        self.throttle_ki = 0.1
-        self.throttle_kd = 0.0
+        self.throttle_kp = CONTROLLER_P
+        self.throttle_ki = CONTROLLER_I
+        self.throttle_kd = CONTROLLER_D
         self.throttle_controller = PID(self.throttle_kp,
                                        self.throttle_ki,
                                        self.throttle_kd,
@@ -71,7 +76,7 @@ class Controller(object):
 
         if linear_vel == 0 and current_vel < MIN_SPEED:
             throttle = 0
-            brake = 700 # Nm to keep car stationary
+            brake = BRAKE_STATIONARY_FORCE # Nm to keep car stationary
         elif throttle < .1 and vel_error < 0:
             throttle = 0
             brake = abs( max(vel_error, self.decel_limit) * self.vehicle_mass * self.wheel_radius)
