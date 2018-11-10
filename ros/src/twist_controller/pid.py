@@ -25,8 +25,8 @@ class PID(object):
         self.error["kp_error"] =  error
         self.error["ki_error"] += error * sample_time
 
-        val =  - self.kp * self.error["kp_error"] - \
-                 self.ki * self.error["ki_error"] - \
+        val =    self.kp * self.error["kp_error"] + \
+                 self.ki * self.error["ki_error"] + \
                  self.kd * self.error["kd_error"]
 
         if val > self.max:
