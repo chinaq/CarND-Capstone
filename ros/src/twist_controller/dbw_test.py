@@ -38,7 +38,10 @@ class DBWTestNode(object):
 
         rospy.Subscriber('/vehicle/dbw_enabled', Bool, self.dbw_enabled_cb)
 
-        self.steer = self.throttle = self.brake = None
+        rospy.Subscriber('/current_velocity', TwistStamped, self.velcity_cb)
+
+
+        self.steer = self.throttle = self.brake = self.vel = None
 
         self.steer_data = []
         self.throttle_data = []
@@ -70,7 +73,7 @@ class DBWTestNode(object):
             writer.writerows(self.throttle_data)
 
         with open(self.brakefile, 'w') as csvfile:
-            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+            writer = csv.DictWriter(csvfile, fieldnames=['actual', 'proposed', 'velocity'])
             writer.writeheader()
             writer.writerows(self.brake_data)
 
@@ -86,6 +89,9 @@ class DBWTestNode(object):
     def brake_cb(self, msg):
         self.brake = msg.pedal_cmd
 
+    def velcity_cb(self, msg):
+        self.vel = msg.twist.linear.x
+
     def actual_steer_cb(self, msg):
         if self.dbw_enabled and self.steer is not None:
             self.steer_data.append({'actual': msg.steering_wheel_angle_cmd,
@@ -93,17 +99,18 @@ class DBWTestNode(object):
             self.steer = None
 
     def actual_throttle_cb(self, msg):
-        if self.dbw_enabled and self.throttle is not None:
+        if self.dbw_enabled and self.throttle is not None and self.vel is not None:
             self.throttle_data.append({'actual': msg.pedal_cmd,
-                                       'proposed': self.throttle})
+                                       'proposed': self.throttle,
+                                       'velocity' : self.vel})
             self.throttle = None
+            self.vel = None
 
     def actual_brake_cb(self, msg):
         if self.dbw_enabled and self.brake is not None:
             self.brake_data.append({'actual': msg.pedal_cmd,
                                     'proposed': self.brake})
             self.brake = None
-
 
 if __name__ == '__main__':
     DBWTestNode()
