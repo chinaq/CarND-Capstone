@@ -69,12 +69,12 @@ class DBWTestNode(object):
             writer.writerows(self.steer_data)
 
         with open(self.throttlefile, 'w') as csvfile:
-            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+            writer = csv.DictWriter(csvfile, fieldnames=['actual', 'proposed', 'velocity'])
             writer.writeheader()
             writer.writerows(self.throttle_data)
 
         with open(self.brakefile, 'w') as csvfile:
-            writer = csv.DictWriter(csvfile, fieldnames=['actual', 'proposed', 'velocity'])
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
             writer.writeheader()
             writer.writerows(self.brake_data)
 
