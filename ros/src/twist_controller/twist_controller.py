@@ -36,8 +36,8 @@ class Controller(object):
                                        mn=const.THROTTLE_MIN,
                                        mx=const.THROTTLE_MAX)
         
-        self.vel_tau = 0.5 # cutoff freq
-        self.vel_ts = 0.02 # ms
+        self.vel_tau = const.LPF_CUTTOFF_FREQ
+        self.vel_ts = const.LPF_TS
         self.vel_lowPassFilter = LowPassFilter(self.vel_tau, self.vel_ts)
 
         self.last_time = rospy.get_time()

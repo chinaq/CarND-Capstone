@@ -17,3 +17,6 @@ BRAKE_STATIONARY_FORCE = 700 # Nm to keep car stationary
 
 MIN_NUM = float('-inf')
 MAX_NUM = float('inf')
+
+LPF_CUTTOFF_FREQ = 0.5
+LPF_TS = 1/DBW_UPDATE_FREQ
