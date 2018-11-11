@@ -5,7 +5,8 @@ import csv
 
 import rospy
 from std_msgs.msg import Bool
-from dbw_mkz_msgs.msg import ThrottleCmd, SteeringCmd, BrakeCmd, SteeringReport, TwistStamped
+from dbw_mkz_msgs.msg import ThrottleCmd, SteeringCmd, BrakeCmd, SteeringReport
+from geometry_msgs.msg import TwistStamped
 
 
 '''
