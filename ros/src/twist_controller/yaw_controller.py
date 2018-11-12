@@ -1,5 +1,6 @@
 from math import atan
 import constants as const
+from ackermann_msgs.msg import AckermannDriveStamped
 
 class YawController(object):
     def __init__(self, wheel_base, steer_ratio, min_speed, max_lat_accel, max_steer_angle):
