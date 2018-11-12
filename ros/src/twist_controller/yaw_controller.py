@@ -1,6 +1,5 @@
 from math import atan
 import constants as const
-from ackermann_msgs.msg import AckermannDriveStamped
 
 class YawController(object):
     def __init__(self, wheel_base, steer_ratio, min_speed, max_lat_accel, max_steer_angle):
@@ -12,22 +11,12 @@ class YawController(object):
         self.min_angle = -max_steer_angle
         self.max_angle = max_steer_angle
 
-
-    def get_angle(self, radius):
-        angle = atan(self.wheel_base / radius) * self.steer_ratio
-        return max(self.min_angle, min(self.max_angle, angle))
-
     def get_steering(self, linear_velocity, angular_velocity, current_velocity):
         steering = 0.0
-        if abs(linear_velocity) > 0.0:
-            angular_velocity = current_velocity * angular_velocity / linear_velocity 
-        else:
-            angular_velocity = 0.0
-
-        if abs(current_velocity) > const.CLOSE_TO_ZERO_SPEED:
-            max_yaw_rate = abs(self.max_lat_accel / current_velocity)
-            angular_velocity = max(-max_yaw_rate, min(max_yaw_rate, angular_velocity))
-            if abs(angular_velocity) > 0.0:
-                radius = max(current_velocity, self.min_speed) / angular_velocity
-                steering = self.get_angle(radius)
+        radius = 0.0
+        if abs(linear_velocity) >= const.CLOSE_TO_ZERO_SPEED and 
+           abs(angular_velocity) >= const.CLOSE_TO_ZERO_SPEED:
+           radius = linear_velocity / angular_velocity
+           angle = math.atan(self.wheel_base / radius) * self.steer_ratio
+           steering = max(self.min_angle, min(self.max_angle, angle))
         return steering
