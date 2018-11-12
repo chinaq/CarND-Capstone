@@ -68,6 +68,7 @@ class WaypointUpdater(object):
         lane.header = self.base_waypoints.header
         look_ahead_wp_max = self.nearest_wp_idx + LOOKAHEAD_WPS
         base_wpts = self.base_waypoints.waypoints[self.nearest_wp_idx:look_ahead_wp_max]
+        rospy.loginfo("stop_wp @ %i", stop_wp )
         if self.stop_wp == NO_WP or (self.stop_wp >= look_ahead_wp_max):
             lane.waypoints = base_wpts
         else:
