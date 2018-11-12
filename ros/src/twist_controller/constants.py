@@ -1,7 +1,7 @@
 # The DBW system on Carla expects messages at this frequency, 
 # and will disengage (reverting control back to the driver) 
 # if control messages are published at less than 10hz. 
-DBW_UPDATE_FREQ = 50 
+DBW_UPDATE_FREQ = 50. 
 
 GAS_DENSITY = 2.858
 ONE_MPH = 0.44704
@@ -19,4 +19,4 @@ MIN_NUM = float('-inf')
 MAX_NUM = float('inf')
 
 LPF_CUTTOFF_FREQ = 0.5
-LPF_TS = 1/DBW_UPDATE_FREQ
+LPF_TS = 1./DBW_UPDATE_FREQ
