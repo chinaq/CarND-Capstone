@@ -79,10 +79,11 @@ class WaypointUpdater(object):
                 if stop_idx >= STOPLINE:
                     dist = self.distance(base_wpts, i, stop_idx)
                     if dist <= 0.0001:
-                        dist = 0.0001
-                    vel = math.log(DECEL_RATE**2*dist)
-                    if vel < 1.:
                         vel = 0.
+                    else:
+                        vel = math.log(DECEL_RATE**2*dist)
+                        if vel < 1.:
+                            vel = 0.
                 else:
                     vel = 0.
                 temp_wp.twist.twist.linear.x = min(vel, wp.twist.twist.linear.x)
