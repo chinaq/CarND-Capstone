@@ -14,8 +14,8 @@ class YawController(object):
     def get_steering(self, linear_velocity, angular_velocity, current_velocity):
         steering = 0.0
         radius = 0.0
-        if abs(linear_velocity) >= const.CLOSE_TO_ZERO_SPEED and \
-           abs(angular_velocity) >= const.CLOSE_TO_ZERO_SPEED:
+        if abs(linear_velocity) >= 0.0 and \
+           abs(angular_velocity) >= 0.0:
            radius = linear_velocity / angular_velocity
            angle = atan(self.wheel_base / radius) * self.steer_ratio
            steering = max(self.min_angle, min(self.max_angle, angle))
