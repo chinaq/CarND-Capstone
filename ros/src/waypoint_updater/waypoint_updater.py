@@ -78,7 +78,7 @@ class WaypointUpdater(object):
                 temp_wp.pose = wp.pose
                 if stop_idx >= STOPLINE:
                     dist = self.distance(base_wpts, i, stop_idx)
-                    vel = math.log(DECEL_RATE^2*dist)
+                    vel = math.log(DECEL_RATE**2*dist)
                     if vel < 1.:
                         vel = 0.
                 else:
