@@ -55,6 +55,7 @@ class WaypointUpdater(object):
             if self.pose and self.base_waypoints and self.waypoint_ktree != None:
                 self.nearest_wp_idx = self.get_nearest_wp_indx()
                 self.publish_waypoints()
+                # don't update unless we get new positional data
                 self.pose = None
             rate.sleep()
 
@@ -67,13 +68,11 @@ class WaypointUpdater(object):
         lane.header = self.base_waypoints.header
         look_ahead_wp_max = self.nearest_wp_idx + LOOKAHEAD_WPS
         base_wpts = self.base_waypoints.waypoints[self.nearest_wp_idx:look_ahead_wp_max]
-        rospy.loginfo("stop_wp @ %i", self.stop_wp )
         if self.stop_wp == NO_WP or (self.stop_wp >= look_ahead_wp_max):
             lane.waypoints = base_wpts
         else:
             temp_wps = []
             stop_idx = max(self.stop_wp - self.nearest_wp_idx - STOPLINE, 0)
-            rospy.loginfo("stop_idx @ %i", stop_idx )
             for i, wp in enumerate(base_wpts):
                 temp_wp = Waypoint()
                 temp_wp.pose = wp.pose
@@ -84,7 +83,7 @@ class WaypointUpdater(object):
                         vel = 0.
                 else:
                     vel = 0.
-                temp_wp.twist.twist.linear.x = min(vel, wp.twist.twist.linear.x)
+                temp_wp.twist.twist.linear.x = min(vel, temp_wps.twist.twist.linear.x)
                 temp_wps.append(temp_wp)
             lane.waypoints = temp_wps
         return lane
@@ -101,9 +100,11 @@ class WaypointUpdater(object):
         prev_vect = np.array(prev_coord)
         positive_vect = np.array([ptx,pty])
 
+        # check if the nearest_coord is infront or behind the car
         val = np.dot(neareset_vect-prev_vect, positive_vect-neareset_vect)
 
         if val > 0.0:
+            # works for waypoints that are in a loop
             nearest_indx = (nearest_indx + 1) % len(self.waypoints_2d)
 
         return nearest_indx
