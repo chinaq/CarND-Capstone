@@ -59,11 +59,11 @@ class Controller(object):
 
         throttle = self.throttle_controller.step(vel_error,dt)
 
-        if linear_vel == 0 and current_vel < const.CLOSE_TO_ZERO_SPEED:
+        if linear_vel == const.ZERO and current_vel < const.CLOSE_TO_ZERO_SPEED:
             throttle = 0
             self.throttle_controller.reset()
             brake = const.BRAKE_STATIONARY_FORCE 
-        elif throttle < const.CLOSE_TO_ZERO_SPEED and vel_error < 0:
+        elif throttle < const.CLOSE_TO_ZERO_SPEED and vel_error < const.ZERO:
             throttle = 0
             brake = abs( max(vel_error, self.decel_limit) * self.vehicle_mass * self.wheel_radius)
 
