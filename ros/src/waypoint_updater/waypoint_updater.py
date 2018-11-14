@@ -26,7 +26,7 @@ LOOKAHEAD_WPS = 50 # Number of waypoints we will publish. You can change this nu
 UPDATE_RATE = 30 #hz
 NO_WP = -1
 DECEL_RATE = 1.5 # m/s^2
-STOPLINE = 3 # waypoints behind stopline to stop
+STOPLINE = 1 # waypoints behind stopline to stop
 
 class WaypointUpdater(object):
     def __init__(self, rate_hz=UPDATE_RATE):
@@ -71,7 +71,7 @@ class WaypointUpdater(object):
         if self.stop_wp == NO_WP or (self.stop_wp >= look_ahead_wp_max):
             lane.waypoints = base_wpts
         else:
-            temp_wps = []
+            temp_waypoints = []
             stop_idx = max(self.stop_wp - self.nearest_wp_idx - STOPLINE, 0)
             for i, wp in enumerate(base_wpts):
                 temp_wp = Waypoint()
@@ -83,9 +83,9 @@ class WaypointUpdater(object):
                         vel = 0.
                 else:
                     vel = 0.
-                temp_wp.twist.twist.linear.x = min(vel, temp_wps.twist.twist.linear.x)
-                temp_wps.append(temp_wp)
-            lane.waypoints = temp_wps
+                temp_wp.twist.twist.linear.x = min(vel, wp.twist.twist.linear.x)
+                temp_waypoints.append(temp_wp)
+            lane.waypoints = temp_waypoints
         return lane
 
     def get_nearest_wp_indx(self):

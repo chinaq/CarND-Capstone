@@ -27,12 +27,9 @@ class Controller(object):
                                             max_lat_accel,
                                             max_steer_angle)
 
-        self.throttle_kp = const.THROTTLE_KP
-        self.throttle_ki = const.THROTTLE_KI
-        self.throttle_kd = const.THROTTLE_KD
-        self.throttle_controller = PID(self.throttle_kp,
-                                       self.throttle_ki,
-                                       self.throttle_kd,
+        self.throttle_controller = PID(const.THROTTLE_KP,
+                                       const.THROTTLE_KI,
+                                       const.THROTTLE_KD,
                                        mn=const.THROTTLE_MIN,
                                        mx=const.THROTTLE_MAX)
         
