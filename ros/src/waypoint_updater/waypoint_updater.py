@@ -23,7 +23,7 @@ as well as to verify your TL classifier.
 '''
 
 LOOKAHEAD_WPS = 50 # Number of waypoints we will publish. You can change this number
-UPDATE_RATE = 30 #hz
+UPDATE_RATE = 50 #hz
 NO_WP = -1
 DECEL_RATE = 4.9 # m/s^2
 STOPLINE = 3 # waypoints behind stopline to stop
