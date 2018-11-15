@@ -47,8 +47,8 @@ class WaypointUpdater(object):
         self.freq = rate_hz
         self.nearest_wp_idx = NO_WP
         self.stop_wp = NO_WP
-        self.loop()
         self.previous_vel = 0.0
+        self.loop()
 
     def loop(self):
         rate = rospy.Rate(self.freq)
