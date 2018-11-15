@@ -47,7 +47,6 @@ class WaypointUpdater(object):
         self.freq = rate_hz
         self.nearest_wp_idx = NO_WP
         self.stop_wp = NO_WP
-        self.previous_vel = 0.0
         self.loop()
 
     def loop(self):
@@ -71,33 +70,22 @@ class WaypointUpdater(object):
         base_wpts = self.base_waypoints.waypoints[self.nearest_wp_idx:look_ahead_wp_max]
         if self.stop_wp == NO_WP or (self.stop_wp >= look_ahead_wp_max):
             lane.waypoints = base_wpts
-            rospy.loginfo("lane.waypoints = base_wpts")
-        elif self.previous_vel == 0.0 and (self.stop_wp <= look_ahead_wp_max):
-            temp_waypoints = []
-            for i, wp in enumerate(base_wpts):
-                temp_wp = Waypoint()
-                temp_wp.pose = wp.pose
-                temp_wp.twist.twist.linear.x = self.previous_vel
-                temp_waypoints.append(temp_wp)
-            lane.waypoints = temp_waypoints
         else:
             temp_waypoints = []
             stop_idx = max(self.stop_wp - self.nearest_wp_idx - STOPLINE, 0)
             for i, wp in enumerate(base_wpts):
                 temp_wp = Waypoint()
                 temp_wp.pose = wp.pose
-                vel = 0.0
                 if stop_idx >= STOPLINE:
                     dist = self.distance(base_wpts, i, stop_idx)
                     vel = math.sqrt(DECEL_RATE*2*dist)
-                    if vel < 1.0:
-                        vel = 0.0
+                    if vel < 1.:
+                        vel = 0.
                 else:
-                    vel = 0.0
+                    vel = 0.
                 temp_wp.twist.twist.linear.x = min(vel, wp.twist.twist.linear.x)
                 temp_waypoints.append(temp_wp)
-            self.previous_vel = lane.waypoints = temp_waypoints
-        lane.waypoints[0].twist.twist.linear.x
+            lane.waypoints = temp_waypoints
         return lane
 
     def get_nearest_wp_indx(self):
