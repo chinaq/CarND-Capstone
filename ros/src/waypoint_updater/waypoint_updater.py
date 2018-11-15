@@ -86,16 +86,18 @@ class WaypointUpdater(object):
             for i, wp in enumerate(base_wpts):
                 temp_wp = Waypoint()
                 temp_wp.pose = wp.pose
+                vel = 0.0
                 if stop_idx >= STOPLINE:
                     dist = self.distance(base_wpts, i, stop_idx)
-                    self.previous_vel = math.sqrt(DECEL_RATE*2*dist)
-                    if self.previous_vel < 1.0:
-                        self.previous_vel = 0.0
+                    vel = math.sqrt(DECEL_RATE*2*dist)
+                    if vel < 1.0:
+                        vel = 0.0
                 else:
-                    self.previous_vel = 0.0
-                temp_wp.twist.twist.linear.x = min(self.previous_vel, wp.twist.twist.linear.x)
+                    vel = 0.0
+                temp_wp.twist.twist.linear.x = min(vel, wp.twist.twist.linear.x)
                 temp_waypoints.append(temp_wp)
-            lane.waypoints = temp_waypoints
+            self.previous_vel = lane.waypoints = temp_waypoints
+        lane.waypoints[0].twist.twist.linear.x
         return lane
 
     def get_nearest_wp_indx(self):
