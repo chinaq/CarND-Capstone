@@ -26,7 +26,7 @@ LOOKAHEAD_WPS = 50 # Number of waypoints we will publish. You can change this nu
 UPDATE_RATE = 30 #hz
 NO_WP = -1
 DECEL_RATE = 1.5 # m/s^2
-STOPLINE = 3 # waypoints behind stopline to stop
+STOPLINE = 6 # waypoints behind stopline to stop
 
 class WaypointUpdater(object):
     def __init__(self, rate_hz=UPDATE_RATE):
