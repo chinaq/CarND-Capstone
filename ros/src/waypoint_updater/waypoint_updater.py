@@ -86,7 +86,7 @@ class WaypointUpdater(object):
                         vel = 0.0
                 else:
                     vel = 0.0
-                temp_wp.twist.twist.linear.x = min(vel, wp.twist.twist.linear.x)
+                temp_wp.twist.twist.linear.x = min(vel, wp.twist.twist.linear.x[0])
                 temp_waypoints.append(temp_wp)
             lane.waypoints = temp_waypoints
         return lane
