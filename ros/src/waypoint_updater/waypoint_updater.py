@@ -26,7 +26,7 @@ LOOKAHEAD_WPS = 50 # Number of waypoints we will publish. You can change this nu
 UPDATE_RATE = 30 #hz
 NO_WP = -1
 DECEL_RATE = 1.5 # m/s^2
-STOPLINE = 6 # waypoints behind stopline to stop
+STOPLINE = 3 # waypoints behind stopline to stop
 
 class WaypointUpdater(object):
     def __init__(self, rate_hz=UPDATE_RATE):
@@ -48,6 +48,7 @@ class WaypointUpdater(object):
         self.nearest_wp_idx = NO_WP
         self.stop_wp = NO_WP
         self.loop()
+        self.previous_vel = 0.0
 
     def loop(self):
         rate = rospy.Rate(self.freq)
@@ -70,6 +71,14 @@ class WaypointUpdater(object):
         base_wpts = self.base_waypoints.waypoints[self.nearest_wp_idx:look_ahead_wp_max]
         if self.stop_wp == NO_WP or (self.stop_wp >= look_ahead_wp_max):
             lane.waypoints = base_wpts
+        elif self.previous_vel == 0.0:
+            temp_waypoints = []
+            for i, wp in enumerate(base_wpts):
+                temp_wp = Waypoint()
+                temp_wp.pose = wp.pose
+                temp_wp.twist.twist.linear.x = self.previous_vel
+                temp_waypoints.append(temp_wp)
+            lane.waypoints = temp_waypoints
         else:
             temp_waypoints = []
             stop_idx = max(self.stop_wp - self.nearest_wp_idx - STOPLINE, 0)
@@ -78,12 +87,12 @@ class WaypointUpdater(object):
                 temp_wp.pose = wp.pose
                 if stop_idx >= STOPLINE:
                     dist = self.distance(base_wpts, i, stop_idx)
-                    vel = math.sqrt(DECEL_RATE*2*dist)
-                    if vel < 1.:
-                        vel = 0.
+                    self.previous_vel = math.sqrt(DECEL_RATE*2*dist)
+                    if self.previous_vel < 1.0:
+                        self.previous_vel = 0.0
                 else:
-                    vel = 0.
-                temp_wp.twist.twist.linear.x = min(vel, wp.twist.twist.linear.x)
+                    self.previous_vel = 0.0
+                temp_wp.twist.twist.linear.x = min(self.previous_vel, wp.twist.twist.linear.x)
                 temp_waypoints.append(temp_wp)
             lane.waypoints = temp_waypoints
         return lane
