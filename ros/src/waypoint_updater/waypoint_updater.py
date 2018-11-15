@@ -71,7 +71,8 @@ class WaypointUpdater(object):
         base_wpts = self.base_waypoints.waypoints[self.nearest_wp_idx:look_ahead_wp_max]
         if self.stop_wp == NO_WP or (self.stop_wp >= look_ahead_wp_max):
             lane.waypoints = base_wpts
-        elif self.previous_vel == 0.0:
+            rospy.loginfo("lane.waypoints = base_wpts")
+        elif self.previous_vel == 0.0 and (self.stop_wp <= look_ahead_wp_max):
             temp_waypoints = []
             for i, wp in enumerate(base_wpts):
                 temp_wp = Waypoint()
