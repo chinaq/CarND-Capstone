@@ -16,6 +16,7 @@ class Controller(object):
                  max_lat_accel,
                  max_steer_angle):
 
+
         self.decel_limit = decel_limit
         self.vehicle_mass = vehicle_mass
         self.wheel_radius = wheel_radius
@@ -58,6 +59,7 @@ class Controller(object):
         self.last_time = now
 
         throttle = self.throttle_controller.step(vel_error,dt)
+
 
         if abs(linear_vel) < const.CLOSE_TO_ZERO_SPEED and current_vel < const.CLOSE_TO_ZERO_SPEED:
             rospy.loginfo("linear_vel = %s",linear_vel)
