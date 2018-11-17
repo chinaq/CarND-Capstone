@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import rospy
-from geometry_msgs.msg import PoseStamped
+from geometry_msgs.msg import PoseStamped, TwistStamped
 from styx_msgs.msg import Lane, Waypoint
 from scipy.spatial import KDTree
 import numpy as np
@@ -36,6 +36,7 @@ class WaypointUpdater(object):
         rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb)
         rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb)
         rospy.Subscriber('/traffic_waypoint', Int32, self.traffic_cb)
+        rospy.Subscriber('/current_velocity', TwistStamped, self.velcity_cb)
         
         # TODO: Add a subscriber for /traffic_waypoint and /obstacle_waypoint below
 
@@ -48,6 +49,7 @@ class WaypointUpdater(object):
         self.freq = rate_hz
         self.nearest_wp_idx = NO_WP
         self.stop_wp = NO_WP
+        self.current_vel = 0.0
         self.loop()
 
     def loop(self):
@@ -63,15 +65,18 @@ class WaypointUpdater(object):
     
     def account_for_delay(self):
         delay_s = 1./DELAY
-        vel = self.base_waypoints.waypoints[self.nearest_wp_idx].twist.twist.linear.x
+        vel = self.current_vel
         # distance after delay
         delay_x = vel*delay_s
-        rospy.loginfo("vel        = %s",vel)
+        rospy.loginfo("delay_x        = %s",delay_x)
         # get the waypoints
         add = 0
         while delay_x > self.distance(self.base_waypoints.waypoints, self.nearest_wp_idx, self.nearest_wp_idx+add):
             add+=1
         self.nearest_wp_idx+=add
+    
+    def velcity_cb(self, vel_msg):
+        self.current_vel = vel_msg.twist.linear.x
 
     def publish_waypoints(self):
         lane = self.generate_lane()
