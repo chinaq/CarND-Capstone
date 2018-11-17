@@ -37,8 +37,6 @@ class WaypointUpdater(object):
         rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb)
         rospy.Subscriber('/traffic_waypoint', Int32, self.traffic_cb)
         
-        # TODO: Add a subscriber for /traffic_waypoint and /obstacle_waypoint below
-
         self.final_waypoints_pub = rospy.Publisher('final_waypoints', Lane, queue_size=1)
 
         self.pose = None
@@ -60,18 +58,6 @@ class WaypointUpdater(object):
                 # don't update unless we get new positional data
                 self.pose = None
             rate.sleep()
-    
-    # def account_for_delay(self, lane):
-    #     delay_s = 1./DELAY
-    #     vel = get_waypoint_velocity(lane.waypoints[0])
-    #     # distance after delay
-    #     delay_x = vel*delay_s
-    #     rospy.loginfo("vel        = %s",vel)
-    #     # get the waypoints
-    #     add = 0
-    #     while delay_x > self.distance(lane.waypoints, self.nearest_wp_idx, self.nearest_wp_idx+add):
-    #         add+=1
-    #     self.nearest_wp_idx+=add
 
     def publish_waypoints(self):
         lane = self.generate_lane()
@@ -94,6 +80,7 @@ class WaypointUpdater(object):
                     dist = self.distance(base_wpts, i, stop_idx)
                     # account for system lag
                     delay_s = 1./DELAY
+                    # x = xo + vot + .5at^2, xo = 0
                     dist += self.get_waypoint_velocity(base_wpts[i])*delay_s+.5*DECEL_RATE*delay_s*delay_s
                     # v^2 = vo^2 + 2*a*(x-xo)
                     # v^2 = 0 + 2*a*(dist)
