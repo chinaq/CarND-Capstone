@@ -55,23 +55,23 @@ class WaypointUpdater(object):
         while not rospy.is_shutdown():
             if self.pose and self.base_waypoints and self.waypoint_ktree != None:
                 self.nearest_wp_idx = self.get_nearest_wp_indx()
-                self.account_for_delay()
+                
                 self.publish_waypoints()
                 # don't update unless we get new positional data
                 self.pose = None
             rate.sleep()
     
-    def account_for_delay(self):
-        delay_s = 1./DELAY
-        vel = self.base_waypoints.waypoints[self.nearest_wp_idx].twist.twist.linear.x
-        # distance after delay
-        delay_x = vel*delay_s
-        rospy.loginfo("vel        = %s",vel)
-        # get the waypoints
-        add = 0
-        while delay_x > self.distance(self.base_waypoints.waypoints, self.nearest_wp_idx, self.nearest_wp_idx+add):
-            add+=1
-        self.nearest_wp_idx+=add
+    # def account_for_delay(self, lane):
+    #     delay_s = 1./DELAY
+    #     vel = get_waypoint_velocity(lane.waypoints[0])
+    #     # distance after delay
+    #     delay_x = vel*delay_s
+    #     rospy.loginfo("vel        = %s",vel)
+    #     # get the waypoints
+    #     add = 0
+    #     while delay_x > self.distance(lane.waypoints, self.nearest_wp_idx, self.nearest_wp_idx+add):
+    #         add+=1
+    #     self.nearest_wp_idx+=add
 
     def publish_waypoints(self):
         lane = self.generate_lane()
@@ -92,6 +92,9 @@ class WaypointUpdater(object):
                 temp_wp.pose = wp.pose
                 if stop_idx >= STOPLINE:
                     dist = self.distance(base_wpts, i, stop_idx)
+                    # account for system lag
+                    delay_s = 1./DELAY
+                    dist = dist + self.get_waypoint_velocity(base_wpts[i])*delay_s+.5*DECEL_RATE*delay_s*delay_s
                     # v^2 = vo^2 + 2*a*(x-xo)
                     # v^2 = 0 + 2*a*(dist)
                     # v = sqrt(2*a*dist)
@@ -100,7 +103,7 @@ class WaypointUpdater(object):
                         vel = 0.0
                 else:
                     vel = 0.0
-                temp_wp.twist.twist.linear.x = min(vel, base_wpts[0].twist.twist.linear.x)
+                temp_wp.twist.twist.linear.x = min(vel, self.get_waypoint_velocity(base_wpts[0]))
                 temp_waypoints.append(temp_wp)
             lane.waypoints = temp_waypoints
         return lane
