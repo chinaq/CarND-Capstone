@@ -66,11 +66,10 @@ class WaypointUpdater(object):
         vel = self.base_waypoints.waypoints[self.nearest_wp_idx].twist.twist.linear.x
         # distance after delay
         delay_x = vel*delay_s
+        rospy.loginfo("Delay_x = %s",delay_x)
         # get the waypoints
-        look_ahead_wp_max = self.nearest_wp_idx + LOOKAHEAD_WPS
-        base_wpts = self.base_waypoints.waypoints[self.nearest_wp_idx:look_ahead_wp_max]
         add = 0
-        while delay_x > self.distance(base_wpts, self.nearest_wp_idx, self.nearest_wp_idx+add):
+        while delay_x > self.distance(self.base_waypoints.waypoints, self.nearest_wp_idx, self.nearest_wp_idx+add):
             add+=1
         self.nearest_wp_idx+=add
 
