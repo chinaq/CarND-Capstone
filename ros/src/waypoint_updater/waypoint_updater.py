@@ -27,6 +27,7 @@ UPDATE_RATE = 30 #hz
 NO_WP = -1
 DECEL_RATE = 4.9 # m/s^2
 STOPLINE = 3 # waypoints behind stopline to stop
+DELAY = 20. # update difference between this node and twist_controller in hz
 
 class WaypointUpdater(object):
     def __init__(self, rate_hz=UPDATE_RATE):
@@ -54,10 +55,24 @@ class WaypointUpdater(object):
         while not rospy.is_shutdown():
             if self.pose and self.base_waypoints and self.waypoint_ktree != None:
                 self.nearest_wp_idx = self.get_nearest_wp_indx()
+                self.account_for_delay()
                 self.publish_waypoints()
                 # don't update unless we get new positional data
                 self.pose = None
             rate.sleep()
+    
+    def account_for_delay(self):
+        delay_s = 1./DELAY
+        vel = self.base_waypoints.waypoints[self.nearest_wp_idx].twist.twist.linear.x
+        # distance after delay
+        delay_x = vel*delay_s
+        # get the waypoints
+        look_ahead_wp_max = self.nearest_wp_idx + LOOKAHEAD_WPS
+        base_wpts = self.base_waypoints.waypoints[self.nearest_wp_idx:look_ahead_wp_max]
+        add = 0
+        while delay_x > self.distance(base_wpts, self.nearest_wp_idx, self.nearest_wp_idx+add):
+            add+=1
+        self.nearest_wp_idx+=add
 
     def publish_waypoints(self):
         lane = self.generate_lane()
