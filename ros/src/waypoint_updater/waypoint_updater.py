@@ -25,7 +25,7 @@ as well as to verify your TL classifier.
 LOOKAHEAD_WPS = 50 # Number of waypoints we will publish. You can change this number
 UPDATE_RATE = 30 #hz
 NO_WP = -1
-DECEL_RATE = 1.5 # m/s^2
+DECEL_RATE = 4.9 # m/s^2
 STOPLINE = 3 # waypoints behind stopline to stop
 DELAY = 20. # update difference between this node and twist_controller in hz
 
