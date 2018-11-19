@@ -54,10 +54,6 @@ class TLDetector(object):
         self.waypoint_ktree = None
         self.waypoints_2d = None
 
-        self.num_images_with_light_to_collect = 10
-        self.num_images_with_no_light_to_collect = 10
-
-
         rospy.spin()
 
     def pose_cb(self, msg):
@@ -128,12 +124,6 @@ class TLDetector(object):
             int: ID of traffic light color (specified in styx_msgs/TrafficLight)
 
         """
-        while self.num_images_with_light_to_collect < 0 and \
-              light.state == TrafficLight.RED or \
-              light.state == TrafficLight.YELLOW:
-            cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "bgr8")
-            cv2.imwrite('C:/Users/erede/Documents/Udacity/term3/CarND-Capstone/data/light_%s' % 10-self.num_images_with_light_to_collect,cv_image)
-            self.num_images_with_light_to_collect -= 1
 
         return light.state
 
@@ -178,11 +168,6 @@ class TLDetector(object):
         if closest_light != None:
             state = self.get_light_state(closest_light)
             return light_wp, state
-        else:
-            while self.num_images_with_no_light_to_collect < 0:
-                cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "bgr8")
-                cv2.imwrite('C:/Users/erede/Documents/Udacity/term3/CarND-Capstone/data/no_light_%s' % 10-self.num_images_with_no_light_to_collect,cv_image)
-                self.num_images_with_no_light_to_collect -= 1
         self.waypoints = None
         return NO_WP, TrafficLight.UNKNOWN
 
