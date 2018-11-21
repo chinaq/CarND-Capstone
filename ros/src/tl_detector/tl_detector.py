@@ -53,9 +53,6 @@ class TLDetector(object):
         self.last_wp = NO_WP
         self.state_count = 0
 
-        self.waypoint_ktree = None
-        self.waypoints_2d = None
-
         rospy.spin()
 
     def pose_cb(self, msg):
@@ -135,13 +132,7 @@ class TLDetector(object):
             self.prev_light_loc = None
             return False
 
-        return light.state
-
-        #TODO Use classifier to return light state
-
-        # if(not self.has_image):
-        #     self.prev_light_loc = None
-        #     return False
+        cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "bgr8")
 
         # use rgb for detect
         cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "rgb8")
