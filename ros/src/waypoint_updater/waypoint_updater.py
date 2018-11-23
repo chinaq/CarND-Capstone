@@ -25,7 +25,7 @@ as well as to verify your TL classifier.
 LOOKAHEAD_WPS = 50 # Number of waypoints we will publish. You can change this number
 UPDATE_RATE = 30 #hz
 NO_WP = -1
-DECEL_RATE = 4.9 # m/s^2
+DECEL_RATE = 1.5 # m/s^2
 STOPLINE = 3 # waypoints behind stopline to stop
 DELAY = 20. # update difference between this node and twist_controller in hz
 
@@ -80,7 +80,10 @@ class WaypointUpdater(object):
                 if stop_idx >= STOPLINE:
                     dist = self.distance(base_wpts, i, stop_idx)
                     # account for system lag
-                    delay_s = 1./DELAY
+                    if DELAY > 0:
+                        delay_s = 1./DELAY
+                    else:
+                        delay_s = 0
                     # x = xo + vot + .5at^2, xo = 0
                     dist += self.get_waypoint_velocity(base_wpts[i])*delay_s+.5*DECEL_RATE*delay_s*delay_s
                     # v^2 = vo^2 + 2*a*(x-xo)
