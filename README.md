@@ -2,12 +2,30 @@ This is the project repo for the final project of the Udacity Self-Driving Car N
 
 
 # Team Members
-
-| Name          | E-Mail                |
-| Ryan Jonesford   | ryanjonesford@gmail.com |
-| Gulshan Mandhyan | gulshan.mandhyan@gmail.com |
-| Andrea Panella | paneand@gmail.com |
-| Zhonghua Qiang | aaa6263@sina.com |
+<dl>
+    <TABLE>
+        <TR>
+            <TD>Name<TD/>
+            <TD>E-Mail<TD/>
+        <TR/>
+        <TR>
+            <TD>Ryan Jonesford<TD/>
+            <TD>ryanjonesford@gmail.com<TD/>
+        <TR/>
+        <TR>
+            <TD>Gulshan Mandhyan<TD/>
+            <TD>gulshan.mandhyan@gmail.com<TD/>
+        <TR/>
+        <TR>
+            <TD>Andrea Panella<TD/>
+            <TD>paneand@gmail.com<TD/>
+        <TR/>
+        <TR>
+            <TD>Zhonghua Qiang<TD/>
+            <TD>aaa6263@sina.com<TD/>
+        <TR/>
+    <TABLE/>
+<dl/>
 
 # Setup
 
