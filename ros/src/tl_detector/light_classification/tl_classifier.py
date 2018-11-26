@@ -2,18 +2,15 @@ from styx_msgs.msg import TrafficLight
 import numpy as np
 import tensorflow as tf
 
-USE_SSD_INCEPTION = True
-USE_SIM_MODEL = True
-
 class TLClassifier(object):
-    def __init__(self):
+    def __init__(self, is_site):
+
+        self.using_sim_model = not is_site
         
-        if USE_SIM_MODEL:
-            MODEL_PATH = 'light_classification/frozen_models/simulator_model/frozen_inference_graph.pb'
-        elif USE_SSD_INCEPTION:
+        if is_site:
             MODEL_PATH = 'light_classification/frozen_models/ssd_inception_v2/frozen_inference_graph.pb'
-#         else:
-#             MODEL_PATH = '/floyd/home/TL/trained_models/ssdlite_mobilenet_v2_coco_2018_05_09_exported/frozen_inference_graph.pb'
+        else:
+            MODEL_PATH = 'light_classification/frozen_models/simulator_model/frozen_inference_graph.pb'
         
         # Load the graph
         self.detection_graph = tf.Graph()
@@ -41,6 +38,12 @@ class TLClassifier(object):
     
     def get_classification(self, image):
         classes, scores, boxes = self.detect(image)
+        if self.using_sim_model:
+            if 2 in classes:
+                return TrafficLight.RED
+            else:
+                return TrafficLight.UNKNOWN
+
         if (1 in classes):
             return TrafficLight.RED
             # return "Red"

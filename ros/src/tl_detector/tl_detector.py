@@ -12,9 +12,9 @@ import cv2
 import yaml
 from scipy.spatial import KDTree
 
-STATE_COUNT_THRESHOLD = 3
+STATE_COUNT_THRESHOLD = 4 
 NO_WP = -1
-SKIP_VAL = 4
+SKIP_VAL = 0
 
 class TLDetector(object):
     def __init__(self):
@@ -27,6 +27,8 @@ class TLDetector(object):
         '''
 
         rospy.init_node('tl_detector')
+        config_string = rospy.get_param("/traffic_light_config")
+        self.config = yaml.load(config_string)
 
         self.pose = None
         self.waypoints = None
@@ -39,11 +41,13 @@ class TLDetector(object):
         self.last_wp = NO_WP
         self.state_count = 0
         self.bridge = CvBridge()
-        self.light_classifier = TLClassifier()
+        self.light_classifier = TLClassifier(self.config['is_site'])
         self.listener = tf.TransformListener()
         self.skipper = 1
         self.using_classifier = False
-        
+        self.light_dict = { TrafficLight.RED: "RED",
+                            TrafficLight.UNKNOWN: "OTHER"}
+       
         # setup puiblisher
         self.upcoming_red_light_pub = rospy.Publisher('/traffic_waypoint', Int32, queue_size=1)
         
@@ -53,9 +57,7 @@ class TLDetector(object):
         rospy.Subscriber('/vehicle/traffic_lights', TrafficLightArray, self.traffic_cb)
         rospy.Subscriber('/image_color', Image, self.image_cb)
 
-        config_string = rospy.get_param("/traffic_light_config")
-        self.config = yaml.load(config_string)
-
+        
         rospy.spin()
 
     def pose_cb(self, msg):
@@ -79,10 +81,11 @@ class TLDetector(object):
 
         """
         self.using_classifier = True
-        if (self.skipper % SKIP_VAL) != 0:
-            self.skipper += 1
-            return
-        self.skipper = 1
+        if SKIP_VAL > 1:
+            if (self.skipper % SKIP_VAL) != 0:
+                self.skipper += 1
+                return
+            self.skipper = 1
         self.camera_image = msg
         light_wp, light_state = self.process_traffic_lights()
 
@@ -92,7 +95,6 @@ class TLDetector(object):
         of times till we start using it. Otherwise the previous stable state is
         used.
         '''
-
         if self.state != light_state:
             self.state_count = 0
             self.state = light_state
@@ -104,6 +106,7 @@ class TLDetector(object):
         else:
             self.upcoming_red_light_pub.publish(Int32(self.last_wp))
         self.state_count += 1
+        rospy.loginfo("light_state = %s" % self.light_dict[light_state])
 
     def get_closest_waypoint(self, x, y):
         """Identifies the closest path waypoint to the given position
@@ -130,16 +133,12 @@ class TLDetector(object):
             int: ID of traffic light color (specified in styx_msgs/TrafficLight)
 
         """
-        if self.using_classifier:
-            # use rgb8 instead of bgr8 for detect
-            cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "rgb8")
+        # use rgb8 instead of bgr8 for detect
+        cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "rgb8")
 
-            #Get classification
-            light_state = self.light_classifier.get_classification(cv_image)
-            if self.config['is_site']:
-                rospy.loginfo("light_state = %s" % light_state)
-        else:
-            light_state = light.state
+        #Get classification
+        light_state = self.light_classifier.get_classification(cv_image)
+
         return light_state
 
     def process_traffic_lights(self):
